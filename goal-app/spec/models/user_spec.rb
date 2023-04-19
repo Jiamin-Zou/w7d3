@@ -62,10 +62,12 @@ RSpec.describe User, type: :model do
   describe "#password=" do
     # FactoryBot.create(:schmiegel)
     it "does not save plain password to the database" do
+      FactoryBot.create(:schmiegel)
       user = User.find_by(username: 'Schmiegel')
       expect(user.password).to_not eq('password')
     end
 
+   
     it "properly sets the password reader" do
       user = User.new(username: 'Jack', password: 'abcdef')
       expect(user.password).to eq('abcdef')
