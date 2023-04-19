@@ -1,6 +1,19 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint           not null, primary key
+#  username        :string           not null
+#  password_digest :string           not null
+#  session_token   :string           not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
+  subject { User.create!(username: 'Joyce Davis', password: 'password')}
+  
   describe "validations" do
     it {should validate_presence_of(:username)}
     it {should validate_presence_of(:password_digest)}
@@ -53,11 +66,29 @@ RSpec.describe User, type: :model do
       expect(user.password).to_not eq('password')
     end
 
+    it "properly sets the password reader" do
+      user = User.new(username: 'Jack', password: 'abcdef')
+      expect(user.password).to eq('abcdef')
+    end
+
     it "secures password using BCrypt" do
       expect(BCrypt::Password).to receive(:create).with('youshallnotpass')
       FactoryBot.build(:user, password: 'youshallnotpass')
     end
   end
 
-  
+  describe "session token" do
+    it "assigns a session token if one is not given" do
+      expect(subject.session_token).to_not be_nil
+    end
+
+    it "uses '#reset_session_token!' to reset a session on a user" do
+      old_token = subject.session_token
+      new_token = subject.reset_session_token!
+      expect(old_token).to_not eq(new_token)
+    end
+  end
+
+
+
 end
